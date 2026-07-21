@@ -1,0 +1,848 @@
+
+SQL*Plus: Release 11.2.0.2.0 Production on Tue Jul 21 13:26:03 2026
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> CONN SCOTT/TIGER
+Connected.
+SQL> SET PAGES 200 LINES 200
+SQL> SELECT * FROM EMP;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+
+14 rows selected.
+
+SQL> Q1) WAQTD the emp details whose job is same as Turner
+SP2-0734: unknown command beginning "Q1) WAQTD ..." - rest of line ignored.
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE JOB LIKE (
+  4   SELECT JOB
+  5  FROM EMP
+  6  WHERE JOB LIKE 'SALESMAN')
+  7  ;
+ SELECT JOB
+ *
+ERROR at line 4:
+ORA-01427: single-row subquery returns more than one row
+
+
+SQL>  SELECT JOB
+  2  FROM EMP
+  3  ;
+
+JOB
+---------
+CLERK
+SALESMAN
+SALESMAN
+MANAGER
+SALESMAN
+MANAGER
+MANAGER
+ANALYST
+PRESIDENT
+SALESMAN
+CLERK
+CLERK
+ANALYST
+CLERK
+
+14 rows selected.
+
+SQL>  SELECT JOB
+  2  FROM EMP
+  3  WHERE JOB LIKE (SELECT J;
+ SELECT JOB
+*
+ERROR at line 1:
+ORA-00921: unexpected end of SQL command
+
+
+SQL> SELECT * FROM EMP
+  2  WHERE JOB IN (
+  3  SELECT JOB FROM EMP
+  4  WHERE ENAME IN "TURNER");
+WHERE ENAME IN "TURNER")
+               *
+ERROR at line 4:
+ORA-00904: "TURNER": invalid identifier
+
+
+SQL> SELECT * FROM EMP
+  2  WHERE JOB IN (
+  3  SELECT JOB FROM EMP;
+SELECT JOB FROM EMP
+                  *
+ERROR at line 3:
+ORA-00907: missing right parenthesis
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE JOB IN (SELECT JOB
+  4  FROM EMP
+  5  WHERE ENAME IN 'TURNER');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+
+SQL> SELECT ENAME , SAL , DEPTNO
+  2  FROM EMPLOYEES
+  3  WHERE HIREDATE IN ( SELECT HIREDATE
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'FORD');
+FROM EMPLOYEES
+     *
+ERROR at line 2:
+ORA-00942: table or view does not exist
+
+
+SQL> SELECT ENAME , SAL , DEPTNO
+  2  FROM EMP
+  3  WHERE HIREDATE IN ( SELECT HIREDATE
+  4  FROM EMPLOYEES
+  5  ;
+
+*
+ERROR at line 5:
+ORA-00907: missing right parenthesis
+
+
+SQL> SELECT ENAME , SAL , DEPTNO
+  2  FROM EMP
+  3  WHERE HIREDATE IN ( SELECT HIREDATE
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'FORD');
+
+ENAME             SAL     DEPTNO
+---------- ---------- ----------
+FORD             3000         20
+JAMES             950         30
+
+SQL> 1)
+SP2-0042: unknown command "1)" - rest of line ignored.
+SQL> SELECT ENAME
+  2  FROM EMP
+  3  WHERE SAL > (SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'ADAMS');
+
+ENAME
+----------
+ALLEN
+WARD
+JONES
+MARTIN
+BLAKE
+CLARK
+SCOTT
+KING
+TURNER
+FORD
+MILLER
+
+11 rows selected.
+
+SQL> 2)
+SP2-0042: unknown command "2)" - rest of line ignored.
+SQL> SELECT ENAME , SALARY
+  2  FROM EMP
+  3  WHERE SAL < ( SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'KING');
+SELECT ENAME , SALARY
+               *
+ERROR at line 1:
+ORA-00904: "SALARY": invalid identifier
+
+
+SQL> SELECT ENAME , SAL
+  2  FROM EMP
+  3  WHERE SAL < ( SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'KING');
+
+ENAME             SAL
+---------- ----------
+SMITH             800
+ALLEN            1600
+WARD             1250
+JONES            2975
+MARTIN           1250
+BLAKE            2850
+CLARK            2450
+SCOTT            3000
+TURNER           1500
+ADAMS            1100
+JAMES             950
+FORD             3000
+MILLER           1300
+
+13 rows selected.
+
+SQL> 3)
+SP2-0042: unknown command "3)" - rest of line ignored.
+SQL> SELECT ENAME , DEPTNO
+  2  FROM EMP
+  3  WHERE DEPTNO IN ( SELECT DEPTNO
+  4  FROM EMP
+  5  WHER ENAME LIKE 'JONES');
+WHER ENAME LIKE 'JONES')
+     *
+ERROR at line 5:
+ORA-00907: missing right parenthesis
+
+
+SQL> SELECT ENAME , DEPTNO
+  2  FROM EMP
+  3  WHERE DEPTNO IN ( SELECT DEPTNO
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'JONES');
+
+ENAME          DEPTNO
+---------- ----------
+FORD               20
+ADAMS              20
+SCOTT              20
+JONES              20
+SMITH              20
+
+SQL> 4
+  4* FROM EMP
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE ;
+WHERE
+     *
+ERROR at line 3:
+ORA-00936: missing expression
+
+
+SQL> SELECT ENAME,JOB
+  2  FROM EMP
+  3  WHERE JOB IN (SELECT JOB
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'JAMES');
+
+ENAME      JOB
+---------- ---------
+MILLER     CLERK
+JAMES      CLERK
+ADAMS      CLERK
+SMITH      CLERK
+
+SQL> 5
+  5* WHERE ENAME LIKE 'JAMES')
+SQL> SELECT EMPNO , ENAME , SAL * 12
+  2  FROM EMP
+  3  WHERE (SAL*12) IN ( SELECT SAL * 12
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'WARDS');
+
+no rows selected
+
+SQL> SELECT EMPNO , ENAME , SAL * 12
+  2  FROM EMP
+  3  WHERE (SAL*12) IN ( SELECT SAL * 12
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'WARD');
+
+     EMPNO ENAME          SAL*12
+---------- ---------- ----------
+      7654 MARTIN          15000
+      7521 WARD            15000
+
+SQL> 6
+SP2-0226: Invalid line number
+SQL> SELECT ENAME , HIREDATE
+  2  FROM EMP
+  3  WHERE HIREDATE < (SELECT HIREDATE
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'SCOTT');
+
+ENAME      HIREDATE
+---------- ---------
+SMITH      17-DEC-80
+ALLEN      20-FEB-81
+WARD       22-FEB-81
+JONES      02-APR-81
+MARTIN     28-SEP-81
+BLAKE      01-MAY-81
+CLARK      09-JUN-81
+KING       17-NOV-81
+TURNER     08-SEP-81
+JAMES      03-DEC-81
+FORD       03-DEC-81
+MILLER     23-JAN-82
+
+12 rows selected.
+
+SQL> 7
+SP2-0226: Invalid line number
+SQL> SELECT ENAME , HIREDATE
+  2  FROM EMP
+  3  WHERE HIREDATE > (SELECT HIREDATE
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'PRESIDENT');
+
+no rows selected
+
+SQL> SELECT ENAME , SAL
+  2  FROM EMP
+  3  WHERE SAL < (SELECT SAL
+  4  FROM EMP
+  5  WHERE EMPNO LIKE '%7839%');
+
+ENAME             SAL
+---------- ----------
+SMITH             800
+ALLEN            1600
+WARD             1250
+JONES            2975
+MARTIN           1250
+BLAKE            2850
+CLARK            2450
+SCOTT            3000
+TURNER           1500
+ADAMS            1100
+JAMES             950
+FORD             3000
+MILLER           1300
+
+13 rows selected.
+
+SQL> 9
+SP2-0226: Invalid line number
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE HIREDATE > (SELECT HIREDATE
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'MILLER');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+
+SQL> 10
+SP2-0226: Invalid line number
+SQL> SELECT ENAME,EMPNO
+  2  FROM EMP
+  3  WHERE SAL < (SELECT SAL
+  4  FROM EMP
+  5  ENAME LIKE 'ALLEN');
+ENAME LIKE 'ALLEN')
+      *
+ERROR at line 5:
+ORA-00907: missing right parenthesis
+
+
+SQL> FROM EMP
+SP2-0042: unknown command "FROM EMP" - rest of line ignored.
+SQL> SELECT ENAME,EMPNO
+  2  FROM EMP
+  3  WHERE SAL < (SELECT SAL
+  4  ENAME LIKE 'ALLEN');
+ENAME LIKE 'ALLEN')
+      *
+ERROR at line 4:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> SELECT ENAME,EMPNO
+  2  FROM EMP
+  3  WHERE SAL < (SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'ALLEN');
+
+ENAME           EMPNO
+---------- ----------
+SMITH            7369
+WARD             7521
+MARTIN           7654
+TURNER           7844
+ADAMS            7876
+JAMES            7900
+MILLER           7934
+
+7 rows selected.
+
+SQL> 11
+SP2-0226: Invalid line number
+SQL> SELECT ENAME , SAL
+  2  FROM EMP
+  3  WHERE ENAME LIKE 'MILLER';
+
+ENAME             SAL
+---------- ----------
+MILLER           1300
+
+SQL> SELECT ENAME , SAL
+  2  FROM EMP
+  3  WHERE SAL > (sELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME IN 'MILLER'
+  6  )
+  7  AND
+  8  SAL < (SELECT SAL
+  9  FROM EMP WHERE ENAME IN 'ALLEN';
+SAL < (SELECT SAL
+       *
+ERROR at line 8:
+ORA-00921: unexpected end of SQL command
+
+
+SQL> SELECT ENAME , SAL
+  2  FROM EMP
+  3  WHERE SAL > (sELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME IN 'MILLER'
+  6  )
+  7  AND
+  8  SAL < (SELECT SAL
+  9  FROM EMP WHERE ENAME IN 'ALLEN');
+
+ENAME             SAL
+---------- ----------
+TURNER           1500
+
+SQL> 12
+SP2-0226: Invalid line number
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE DEPTNO IN (20)
+  4  AND (SELECT JOB
+  5  FROM EMP
+  6  WHERE ENAME LIKE 'SMITH');
+WHERE ENAME LIKE 'SMITH')
+                        *
+ERROR at line 6:
+ORA-00936: missing expression
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE DEPTNO IN (20)
+  4  AND (SELECT JOB
+  5  FROM EMP
+  6  WHERE ENAME IN 'SMITH');
+WHERE ENAME IN 'SMITH')
+                      *
+ERROR at line 6:
+ORA-00936: missing expression
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE DEPTNO IN (20)
+  4  AND IN
+  5  ;
+AND IN
+    *
+ERROR at line 4:
+ORA-00936: missing expression
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE DEPTNO IN (20)
+  4  AND JOB IN (SELECT JOB
+  5  FROM EMP
+  6  WHERE ENAME = 'SMITH');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+
+SQL> 13
+SP2-0226: Invalid line number
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE JOB = 'MANAGER'
+  4  AND DEPTNO IN (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME IN 'TURNER');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+
+SQL> 24
+SP2-0226: Invalid line number
+SQL> 14*
+SP2-0042: unknown command "14*" - rest of line ignored.
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE HIREDATE > 31-DEC-1980
+  4  AND HIREDATE IN (SELECT HIREDATE
+  5  FROM EMP
+  6  WHERE ENAME IN 'KING');
+WHERE HIREDATE > 31-DEC-1980
+                    *
+ERROR at line 3:
+ORA-00904: "DEC": invalid identifier
+
+
+SQL> SELECT ENAME , HIREDATE
+  2  FROM EMP
+  3  WHERE HIREDATE > '01-JAN-1980)
+  4  AND HIREDATE < (SELECT HIREDATE
+  5  FROM EMP
+  6  WHERE ENAME IN 'KING');
+ERROR:
+ORA-01756: quoted string not properly terminated
+
+
+SQL> SELECT ENAME , HIREDATE
+  2  WHERE HIREDATE > '01-JAN-1980')
+  3  FROM EMP
+  4  ;
+WHERE HIREDATE > '01-JAN-1980')
+*
+ERROR at line 2:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> SELECT ENAME , HIREDATE
+  2  FROM EMP
+  3  WHERE HIREDATE > '31-DEC-1980'
+  4  AND HIREDATE < (sELECT HIREDATE
+  5  FROM EMP
+  6  WHERE ENAME IN 'KING');
+
+ENAME      HIREDATE
+---------- ---------
+ALLEN      20-FEB-81
+WARD       22-FEB-81
+JONES      02-APR-81
+MARTIN     28-SEP-81
+BLAKE      01-MAY-81
+CLARK      09-JUN-81
+TURNER     08-SEP-81
+
+7 rows selected.
+
+SQL*Plus: Release 11.2.0.2.0 Production on Tue Jul 21 19:51:52 2026
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> CONN SCOTT/TIGER
+Connected.
+SQL> SET PAGES 100 LINES 100
+SQL> SELECT ENAME , SAL
+  2  FROM EMP
+  3  WHERE SAL > (SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME IN 'MILLER')
+  6  AND
+  7  SAL < (SELECT SAL
+  8  FROM EMP
+  9  WHERE ENAME IN 'ALLEN');
+
+ENAME             SAL
+---------- ----------
+TURNER           1500
+
+SQL> ABOVE WAS THE ANS 0F 11
+SP2-0734: unknown command beginning "ABOVE WAS ..." - rest of line ignored.
+SQL> 12
+SP2-0226: Invalid line number
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE DEPTNO = 20
+  4  AND (SELECT JOB
+  5  FROM EMP
+  6  WHERE ENAME IN 'SMITH');
+WHERE ENAME IN 'SMITH')
+                      *
+ERROR at line 6:
+ORA-00936: missing expression
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE DEPTNO = 20
+  4  AND JOB IN (SELECT JOB
+  5  FROM EMP
+  6  WHERE ENAME LIKE 'SMITH');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+
+SQL> 13
+SP2-0226: Invalid line number
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE JOB = 'MANAGER'
+  4  AND WHERE DEPTNO IN (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME IN 'TURNER');
+AND WHERE DEPTNO IN (SELECT DEPTNO
+    *
+ERROR at line 4:
+ORA-00936: missing expression
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE JOB = 'MANAGER'
+  4  AND WHERE DEPTNO IN (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME LIKE '%TURNER%';
+AND WHERE DEPTNO IN (SELECT DEPTNO
+    *
+ERROR at line 4:
+ORA-00936: missing expression
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE JOB = 'MANAGER'
+  4  AND WHERE DEPTNO IN (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME LIKE '%TURNER%');
+AND WHERE DEPTNO IN (SELECT DEPTNO
+    *
+ERROR at line 4:
+ORA-00936: missing expression
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE JOB = 'MANAGER'
+  4  AND DEPTNO = (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME IN 'TURNER');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+
+SQL> 14
+SP2-0226: Invalid line number
+SQL> SELECT ENAME AND HIREDATE
+  2  FROM EMP
+  3  WHERE HIREDATE > '31-DEC-1980'
+  4  AND HIREDATE < ( SELECT HIREDATE
+  5  FROM EMP
+  6  WHERE EANME IN 'KING');
+SELECT ENAME AND HIREDATE
+             *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> SELECT ENAME, HIREDATE
+  2  FROM EMP
+  3  WHERE HIREDATE > '31-DEC-1980'
+  4  AND HIREDATE < ( SELECT HIREDATE
+  5  FROM EMP
+  6  WHERE EANME IN 'KING');
+WHERE EANME IN 'KING')
+      *
+ERROR at line 6:
+ORA-00904: "EANME": invalid identifier
+
+
+SQL> SELECT ENAME, HIREDATE
+  2  FROM EMP
+  3  WHERE HIREDATE > '31-DEC-1980'
+  4  AND HIREDATE < ( SELECT HIREDATE
+  5  FROM EMP
+  6  WHERE ENAME IN 'KING');
+
+ENAME      HIREDATE
+---------- ---------
+ALLEN      20-FEB-81
+WARD       22-FEB-81
+JONES      02-APR-81
+MARTIN     28-SEP-81
+BLAKE      01-MAY-81
+CLARK      09-JUN-81
+TURNER     08-SEP-81
+
+7 rows selected.
+
+SQL> 15
+SP2-0226: Invalid line number
+SQL> SELECT ENAME , SAL , SAL *12
+  2  FROM EMP
+  3  WHERE SAL < (SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'BLAKE')
+  6  AND
+  7  SAL > 3500;
+
+no rows selected
+
+SQL> SELECT ENAME , SAL , SAL *12
+  2  FROM EMP
+  3  WHERE SAL > 3500
+  4  AND SAL < (SELECT SAL
+  5  FROM EMP
+  6  WHERE ENAME IN 'BLAKE');
+
+no rows selected
+
+SQL> 16
+SP2-0226: Invalid line number
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE SAL > (SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME LIKE 'SCOTT'
+  6  )
+  7  AND
+  8  SAL < (SELECT SAL
+  9  FROM EMP
+ 10  WHERE ENAME IN 'KING');
+
+no rows selected
+
+SQL> 17
+SP2-0226: Invalid line number
+SQL> SELECT ENAME
+  2  FROM EMP
+  3  WHERE ENAME LIKE 'A%'
+  4  AND DEPTNO = (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME IN 'BLAKE');
+
+ENAME
+----------
+ALLEN
+
+SQL> 18
+SP2-0226: Invalid line number
+SQL> SELECT ENAME AND COMM
+  2  FROM EMP
+  3  WHERE JOB = 'CLERK'
+  4  AND DEPTNO IN (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME IN 'TURNER');
+SELECT ENAME AND COMM
+             *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> SELECT * FROM EMP;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+
+14 rows selected.
+
+SQL> SELECT ENAME , COMM
+  2  FROM EMP
+  3  WHERE JOB = 'CLERK'
+  4  AND DEPTNO IN (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME IN 'TURNER');
+
+ENAME            COMM
+---------- ----------
+JAMES
+
+SQL> 18 correct ans writing again dont consider above
+SQL> SELECT ENAME , COMM
+  2  FROM EMP
+  3  WHERE COMM IS NOT NULL
+  4  AND JOB IN (SELECT JOB
+  5  FROM EMP
+  6  WHERE JOB IN 'SMITH');
+
+no rows selected
+
+SQL> 19
+SP2-0226: Invalid line number
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE JOB = 'CLERK'
+  4  AND DEPTNO = (SELECT DEPTNO
+  5  FROM EMP
+  6  WHERE ENAME IN 'TURNER');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+
+SQL> 20
+SP2-0226: Invalid line number
+SQL> SELECT ENAME , JOB
+  2  FROM EMP
+  3  WHERE SAL * 12 > (SELECT SAL
+  4  FROM EMP
+  5  WHERE SAL * 12
+  6  WHERE ENAME IN 'SMITH');
+WHERE ENAME IN 'SMITH')
+*
+ERROR at line 6:
+ORA-00920: invalid relational operator
+
+
+SQL> SELECT ENAME , JOB
+  2  FROM EMP
+  3  WHERE SAL * 12 > ( SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME IN 'SMITH')
+  6  AND
+  7  SA * 12 < (SELECT SAL
+  8  FROM EMP
+  9  WHERE ENAME IN 'KING');
+SA * 12 < (SELECT SAL
+*
+ERROR at line 7:
+ORA-00904: "SA": invalid identifier
+
+
+SQL> FROM EMP
+SP2-0042: unknown command "FROM EMP" - rest of line ignored.
+SQL> SELECT ENAME , JOB
+  2  FROM EMP
+  3  WHERE SAL * 12 > (SELECT SAL
+  4  FROM EMP
+  5  WHERE ENAME IN 'SMITH')
+  6  AND
+  7  SAL * 12 < (SELECT SAL
+  8  FROM EMP
+  9  WHERE ENAME IN 'KING');
+
+no rows selected
