@@ -846,3 +846,108 @@ SQL> SELECT ENAME , JOB
   9  WHERE ENAME IN 'KING');
 
 no rows selected
+
+
+SQL> Q ) WAQTD THE EMP DETAILS WHERE EMP DEPT NAME IS ACCOUNTING
+SP2-0734: unknown command beginning "Q ) WAQTD ..." - rest of line ignored.
+SQL> Q2)
+SP2-0042: unknown command "Q2)" - rest of line ignored.
+SQL> WRITE A QUERY TO DISPLAY EMP NAME , MSG NUMBER FOR THOSE EMP WHOSE DEPTBNAME START WITH A OR B OR S
+SP2-0734: unknown command beginning "WRITE A QU..." - rest of line ignored.
+SQL> Q3)
+SP2-0042: unknown command "Q3)" - rest of line ignored.
+SP2-0044: For a list of known commands enter HELP
+and to leave enter EXIT.
+SQL> WAQTD THE EMP DETAILS WHERE LOCATION IS CHICAGO
+SP2-0734: unknown command beginning "WAQTD THE ..." - rest of line ignored.
+SQL> Q1 ANS)
+SP2-0042: unknown command "Q1 ANS)" - rest of line ignored.
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE DNAME = 'ACCOUNTING';
+WHERE DNAME = 'ACCOUNTING'
+      *
+ERROR at line 3:
+ORA-00904: "DNAME": invalid identifier
+
+
+SQL> Q2) ANS
+SP2-0042: unknown command "Q2) ANS" - rest of line ignored.
+SQL> SELECT * FROM EMP
+  2  WHERE DEPTNO IN (SELECT DEPTNO
+  3  FROM DEPT
+  4  WHERE DNAME = 'ACCOUNTING');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+
+SQL> SELECT ENAME , MGR
+  2  FROM EMP
+  3  WHERE (SELECT *
+  4  FROM DEPT
+  5  WHERE DNAME LIKE 'A%'
+  6  OR DNAME LIKE 'B%'
+  7  OR ENAME LIKE 'S%';
+WHERE (SELECT *
+       *
+ERROR at line 3:
+ORA-00936: missing expression
+
+
+SQL> SELECT ENAME , MGR
+  2  FROM EMP
+  3  WHERE (SELECT *
+  4  FROM DEPT
+  5  WHERE DNAME LIKE 'A%'
+  6  OR DNAME LIKE 'B%'
+  7  OR ENAME LIKE 'S%');
+OR ENAME LIKE 'S%')
+                  *
+ERROR at line 7:
+ORA-00936: missing expression
+
+
+SQL> SELECT *
+  2  FROM EMP
+  3  WHERE DEPTNO IN (SELECT DEPTNO
+  4  FROM DEPT
+  5  WHERE LOC IN 'CHICAGO');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+
+6 rows selected.
+
+SQL> SELECT ENAME , MGR
+  2  FROM EMP
+  3  WHERE DEPTNO = (SELECT DEPTNO
+  4  FROM EMP
+  5  WHERE DNAME LIKE 'A%'
+  6  OR DNAME LIKE 'B%'
+  7  OR DNAME LIKE 'S%');
+OR DNAME LIKE 'S%')
+   *
+ERROR at line 7:
+ORA-00904: "DNAME": invalid identifier
+
+
+SQL> SELECT ENAME , MGR
+  2  FROM EMP
+  3  WHERE DEPTNO = (SELECT DEPTNO
+  4  FROM DEPT
+  5  WHERE DNAME LIKE 'A%'
+  6  OR DNAME LIKE 'B%'
+  7  OR DNAME LIKE 'S%');
+WHERE DEPTNO = (SELECT DEPTNO
+                *
+ERROR at line 3:
+ORA-01427: single-row subquery returns more than one row
